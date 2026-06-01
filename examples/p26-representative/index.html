@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>公司代表管理</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "Noto Sans SC", sans-serif; background: #f5f5f5; padding: 40px; color: #333; }
+.container { max-width: 860px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 32px; }
+h1 { font-size: 22px; margin-bottom: 4px; }
+.subtitle { color: #888; font-size: 13px; margin-bottom: 24px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid #e0e0e0; overflow-x: auto; }
+.tab { padding: 8px 16px; cursor: pointer; border: none; background: none; font-size: 13px; color: #888; border-bottom: 2px solid transparent; white-space: nowrap; }
+.tab.active { color: #1a73e8; border-bottom-color: #1a73e8; font-weight: 500; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.section { margin-bottom: 20px; }
+.section h2 { font-size: 15px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+.form-group { margin-bottom: 8px; }
+.form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 2px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+.form-group textarea { min-height: 50px; resize: vertical; }
+.form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.form-row .form-group { flex: 1; min-width: 130px; }
+.btn { padding: 6px 16px; background: #1a73e8; color: #fff; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; }
+.btn:hover { background: #1557b0; }
+.btn-sm { padding: 3px 10px; font-size: 11px; }
+.btn-secondary { background: #e8e8e8; color: #333; }
+.btn-danger { background: #e53935; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #eee; }
+th { background: #fafafa; font-weight: 500; color: #555; font-size: 11px; }
+.tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; }
+.tag-green { background: #e8f5e9; color: #2e7d32; }
+.tag-red { background: #fce4ec; color: #c62828; }
+.tag-blue { background: #e3f2fd; color: #1565c0; }
+.tag-yellow { background: #fff8e1; color: #f57f17; }
+.card { background: #f9f9f9; border-radius: 4px; padding: 10px; margin-bottom: 6px; }
+.empty-state { padding: 24px; text-align: center; color: #aaa; font-size: 12px; }
+.vote-bar { display: flex; gap: 6px; margin: 6px 0; }
+.vote-bar > span { padding: 3px 14px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+.vote-yea { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+.vote-nay { background: #fce4ec; color: #c62828; border: 1px solid #ffcdd2; }
+.vote-abstain { background: #f5f5f5; color: #888; border: 1px solid #e0e0e0; }
+.vote-bar > span.selected { font-weight: 700; box-shadow: 0 0 0 2px #1a73e8; }
+.powers { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 8px; }
+.power { padding: 10px; border-radius: 4px; font-size: 12px; }
+.power .title { font-weight: 500; margin-bottom: 2px; }
+.power.right { background: #e8f5e9; border-left: 3px solid #2e7d32; }
+.power.duty { background: #fff8e1; border-left: 3px solid #f57f17; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>公司代表管理</h1>
+  <p class="subtitle">依据《量潮科技公司代表章程》v0.5.1。代表资格 → 选举 → 职权 → 辩论 → 退出 → 罢免。</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('elect')">选举</button>
+    <button class="tab" onclick="switchTab('roster')">代表名册</button>
+    <button class="tab" onclick="switchTab('debate')">辩论与表决</button>
+    <button class="tab" onclick="switchTab('recall')">罢免</button>
+  </div>
+
+  <div id="tab-elect" class="tab-content active">
+    <div class="section">
+      <h2>选民登记</h2>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">L1 及以上成员享有选举权。实习生有选举权，实训生无选举权。</p>
+      <div class="form-row">
+        <div class="form-group"><label>成员姓名</label><input type="text" id="voterName"></div>
+        <div class="form-group"><label>职级</label>
+          <select id="voterLevel">
+            <option value="L0">L0 见习/实训生</option>
+            <option value="L1">L1 初级</option>
+            <option value="L2" selected>L2 中级</option>
+            <option value="L3">L3 高级</option>
+            <option value="M1">M1 主管</option>
+            <option value="M2">M2 总监</option>
+            <option value="M3">M3 副总裁</option>
+            <option value="M4">M4 总裁</option>
+            <option value="M5">M5 董事</option>
+            <option value="intern">实习生</option>
+            <option value="trainee">培训生</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="addVoter()">登记</button>
+    </div>
+    <div class="section">
+      <h2>候选人提名</h2>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">候选人须 L2 及以上或培训生身份。L0 无资格，L1 无被提名资格。</p>
+      <div class="form-row">
+        <div class="form-group"><label>候选人姓名</label><input type="text" id="candName"></div>
+        <div class="form-group"><label>职级</label>
+          <select id="candLevel">
+            <option value="L2">L2 中级</option>
+            <option value="L3">L3 高级</option>
+            <option value="M1">M1 主管</option>
+            <option value="M2">M2 总监</option>
+            <option value="M3">M3 副总裁</option>
+            <option value="M4">M4 总裁</option>
+            <option value="M5">M5 董事</option>
+            <option value="trainee">培训生</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="addCandidate()">提名</button>
+    </div>
+    <div class="section">
+      <h2>发起选举</h2>
+      <button class="btn" onclick="startElection()">发起投票</button>
+      <div id="electionResult" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div id="tab-roster" class="tab-content">
+    <div class="section">
+      <h2>当选代表</h2>
+      <div id="repList"><div class="empty-state">暂无当选代表。</div></div>
+    </div>
+    <div class="section">
+      <h2>代表职权</h2>
+      <div class="powers">
+        <div class="power right"><div class="title">信息获取权</div>获取履职相关一切必要信息与文件</div>
+        <div class="power right"><div class="title">提案权</div>提出议案，要求列入议程</div>
+        <div class="power right"><div class="title">审议权</div>提出询问、修正意见，自由发表意见</div>
+        <div class="power right"><div class="title">表决权</div>投赞成、反对或弃权票</div>
+        <div class="power right"><div class="title">程序异议权</div>对违反章程的程序提出异议</div>
+        <div class="power duty"><div class="title">保密义务</div>对机密信息保密，任期结束后持续有效</div>
+        <div class="power duty"><div class="title">提案诚信</div>基于事实，不得捏造</div>
+        <div class="power duty"><div class="title">审议勤勉</div>合理投入，禁止人身攻击</div>
+        <div class="power duty"><div class="title">独立忠实</div>以公司利益为判断依据，利益冲突回避</div>
+        <div class="power duty"><div class="title">程序善意</div>不得重复提出已裁定异议</div>
+      </div>
+    </div>
+    <div class="section"><h2>退出管理</h2><div id="exitTools"></div></div>
+  </div>
+
+  <div id="tab-debate" class="tab-content">
+    <div class="section">
+      <h2>辩论</h2>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">议题聚焦 · 意见平衡 · 主持人中立。反对意见和反对票不得作为报复性对待的依据。</p>
+      <div class="form-group"><label>审议事项</label><input type="text" id="debateTopic"></div>
+      <div id="debateArea"><div class="empty-state">暂无审议事项。</div></div>
+      <button class="btn" onclick="addIssue()">添加审议事项</button>
+    </div>
+  </div>
+
+  <div id="tab-recall" class="tab-content">
+    <div class="section">
+      <h2>罢免程序</h2>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">须下议院三分之一以上代表联名提出，全体有选举权成员三分之二以上多数通过。</p>
+      <div class="form-row">
+        <div class="form-group"><label>被罢免代表</label>
+          <select id="recallRep"><option value="">—</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>罢免理由（满足其一即可）</label>
+        <select id="recallReason">
+          <option value="连续三次无故缺席审议与表决">连续三次无故缺席审议与表决</option>
+          <option value="严重违反忠实勤勉义务">严重违反忠实勤勉义务</option>
+          <option value="利用代表职权谋取不正当利益">利用代表职权谋取不正当利益</option>
+          <option value="因故意或重大过失给公司造成重大损失">因故意或重大过失给公司造成重大损失</option>
+        </select>
+      </div>
+      <div class="form-group"><label>联名代表数（需 ≥ 代表总数/3）</label><input type="number" id="recallPetitioners" min="1" value="1"></div>
+      <button class="btn btn-danger" onclick="startRecall()">发起罢免</button>
+      <div id="recallArea" style="margin-top:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const state = {
+  voters: [],
+  candidates: [],
+  representatives: [],
+  issues: [],
+  recallId: 1
+};
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[onclick*="${tab}"]`).classList.add('active');
+  document.getElementById(`tab-${tab}`).classList.add('active');
+}
+
+function canVote(level) {
+  return level !== 'L0' && level !== 'intern'; // 实训生无选举权
+}
+
+function canBeCandidate(level) {
+  const eligible = ['L2','L3','M1','M2','M3','M4','M5','trainee'];
+  return eligible.includes(level);
+}
+
+function addVoter() {
+  const name = document.getElementById('voterName').value.trim();
+  if (!name) { alert('请输入姓名。'); return; }
+  const level = document.getElementById('voterLevel').value;
+  state.voters.push({ name, level, eligible: canVote(level) });
+  document.getElementById('voterName').value = '';
+  renderVoters();
+}
+
+function renderVoters() {
+  const el = document.getElementById('electionResult');
+  const eligible = state.voters.filter(v => v.eligible);
+  el.innerHTML = `<div style="font-size:12px;color:#888;">已登记 ${state.voters.length} 人，其中 ${eligible.length} 人有选举权</div>`;
+}
+
+function addCandidate() {
+  const name = document.getElementById('candName').value.trim();
+  if (!name) { alert('请输入姓名。'); return; }
+  const level = document.getElementById('candLevel').value;
+  if (!canBeCandidate(level)) {
+    alert('该职级无被提名资格（L0 无资格，L1 无被提名资格）。'); return;
+  }
+  state.candidates.push({ name, level });
+  document.getElementById('candName').value = '';
+  renderCandidates();
+}
+
+function renderCandidates() {
+  const el = document.getElementById('electionResult');
+  const voters = state.voters.filter(v => v.eligible).length;
+  let html = `<div style="font-size:12px;color:#888;">候选人 ${state.candidates.length} 人，有选举权 ${voters} 人</div>`;
+  if (state.candidates.length) {
+    html += '<table style="margin-top:6px;"><tr><th>候选人</th><th>职级</th></tr>' +
+      state.candidates.map(c => `<tr><td>${c.name}</td><td>${c.level}</td></tr>`).join('') + '</table>';
+  }
+  el.innerHTML = html;
+}
+
+function startElection() {
+  if (!state.candidates.length) { alert('请先提名候选人。'); return; }
+  const eligibleVoters = state.voters.filter(v => v.eligible);
+  if (eligibleVoters.length < 3) { alert('有选举权的成员不足 3 人，无法进行有效选举。'); return; }
+
+  const votes = eligibleVoters.map(v => ({
+    voter: v.name,
+    choice: state.candidates[Math.floor(Math.random() * state.candidates.length)].name
+  }));
+
+  const tally = {};
+  votes.forEach(v => { tally[v.choice] = (tally[v.choice] || 0) + 1; });
+
+  const sorted = Object.entries(tally).sort((a,b) => b[1] - a[1]);
+  const elected = sorted[0][0];
+  const electedLevel = state.candidates.find(c => c.name === elected).level;
+
+  // Check if already a representative
+  if (!state.representatives.find(r => r.name === elected)) {
+    state.representatives.push({
+      name: elected, level: electedLevel,
+      electedAt: new Date().toLocaleDateString(),
+      termEnd: new Date(Date.now() + 365*86400000).toLocaleDateString(),
+      absences: 0, status: '在职'
+    });
+  }
+
+  let resultHtml = `<div class="card"><strong>选举结果</strong><br><span style="font-size:13px;">当选代表：${elected}</span><br>`;
+  resultHtml += '<table style="margin-top:6px;"><tr><th>候选人</th><th>得票</th></tr>';
+  sorted.forEach(([name, count]) => {
+    resultHtml += `<tr><td>${name}${name === elected ? ' ✅' : ''}</td><td>${count}</td></tr>`;
+  });
+  resultHtml += '</table></div>';
+  document.getElementById('electionResult').innerHTML = resultHtml;
+  renderReps();
+}
+
+function renderReps() {
+  const el = document.getElementById('repList');
+  const exitTools = document.getElementById('exitTools');
+  const recallSelect = document.getElementById('recallRep');
+
+  if (!state.representatives.length) {
+    el.innerHTML = '<div class="empty-state">暂无当选代表。请先在「选举」页完成选举。</div>';
+    exitTools.innerHTML = '';
+    recallSelect.innerHTML = '<option value="">—</option>';
+    return;
+  }
+
+  el.innerHTML = `<table><tr><th>姓名</th><th>职级</th><th>当选日期</th><th>任期截止</th><th>缺席</th><th>状态</th><th>操作</th></tr>
+    ${state.representatives.map((r,i) => `<tr>
+      <td>${r.name}</td><td>${r.level}</td><td>${r.electedAt}</td><td>${r.termEnd}</td>
+      <td>${r.absences} 次</td>
+      <td><span class="tag ${r.status === '在职' ? 'tag-green' : r.status === '已辞职' ? 'tag-yellow' : 'tag-red'}">${r.status}</span></td>
+      <td>
+        <button class="btn btn-sm" onclick="resignRep(${i})">辞职</button>
+        <button class="btn btn-sm btn-secondary" onclick="markAbsent(${i})">+缺席</button>
+      </td>
+    </tr>`).join('')}</table>`;
+
+  exitTools.innerHTML = `<p style="font-size:12px;color:#888;">代表资格终止情形：任期届满、辞职、罢免、降级至L1及以下、离职。</p>`;
+
+  recallSelect.innerHTML = state.representatives.filter(r => r.status === '在职')
+    .map(r => `<option value="${r.name}">${r.name}</option>`).join('');
+}
+
+function resignRep(idx) {
+  state.representatives[idx].status = '已辞职';
+  renderReps();
+}
+
+function markAbsent(idx) {
+  state.representatives[idx].absences++;
+  renderReps();
+}
+
+function addIssue() {
+  const topic = document.getElementById('debateTopic').value.trim();
+  if (!topic) { alert('请输入审议事项。'); return; }
+  state.issues.push({ id: Date.now(), topic, votes: { yea: 0, nay: 0, abstain: 0 }, myVote: null, result: '' });
+  document.getElementById('debateTopic').value = '';
+  renderDebate();
+}
+
+function renderDebate() {
+  const el = document.getElementById('debateArea');
+  if (!state.issues.length) { el.innerHTML = '<div class="empty-state">暂无审议事项。</div>'; return; }
+  el.innerHTML = state.issues.filter(i => !i.result).map(i => `<div class="card">
+    <strong>${i.topic}</strong>
+    <div class="vote-bar">
+      <span class="vote-yea ${i.myVote === 'yea' ? 'selected' : ''}" onclick="voteOnIssue(${i.id},'yea')">赞成 (${i.votes.yea})</span>
+      <span class="vote-nay ${i.myVote === 'nay' ? 'selected' : ''}" onclick="voteOnIssue(${i.id},'nay')">反对 (${i.votes.nay})</span>
+      <span class="vote-abstain ${i.myVote === 'abstain' ? 'selected' : ''}" onclick="voteOnIssue(${i.id},'abstain')">弃权 (${i.votes.abstain})</span>
+      <span style="font-size:12px;font-weight:500;margin-left:auto;">${voteResultStr(i)}</span>
+    </div>
+    <button class="btn btn-sm" onclick="finalizeIssue(${i.id})">结束表决</button>
+  </div>`).join('') + (state.issues.filter(i => i.result).length ? '<div style="margin-top:8px;"><strong>已决事项</strong>' +
+    state.issues.filter(i => i.result).map(i => `<div style="padding:4px 8px;font-size:12px;color:#555;">${i.topic} — ${i.result}</div>`).join('') + '</div>' : '');
+}
+
+function voteOnIssue(id, vote) {
+  const i = state.issues.find(x => x.id === id);
+  if (!i || i.result) return;
+  if (i.myVote) i.votes[i.myVote] = Math.max(0, i.votes[i.myVote] - 1);
+  i.myVote = vote;
+  i.votes[vote]++;
+  renderDebate();
+}
+
+function voteResultStr(i) {
+  const t = i.votes.yea + i.votes.nay + i.votes.abstain;
+  if (!t) return '等待投票';
+  return i.votes.yea / t >= 2/3 ? '✅ 通过' : i.votes.yea / t > 0.5 ? '⚠ 趋向通过' : '❌ 不通过';
+}
+
+function finalizeIssue(id) {
+  const i = state.issues.find(x => x.id === id);
+  if (!i) return;
+  const t = i.votes.yea + i.votes.nay + i.votes.abstain;
+  i.result = t && i.votes.yea / t >= 2/3 ? '✅ 通过' : '❌ 不通过';
+  renderDebate();
+}
+
+function startRecall() {
+  const name = document.getElementById('recallRep').value;
+  if (!name) { alert('请选择被罢免的代表。'); return; }
+  const rep = state.representatives.find(r => r.name === name && r.status === '在职');
+  if (!rep) { alert('该代表不在职。'); return; }
+
+  const totalVoters = state.voters.filter(v => v.eligible).length;
+  const petitioners = parseInt(document.getElementById('recallPetitioners').value) || 0;
+  const threshold = Math.ceil(state.representatives.filter(r => r.status === '在职').length / 3);
+
+  if (petitioners < threshold) {
+    alert(`联名代表不足：需要至少 ${threshold} 名代表联名（当前代表总数 ${state.representatives.filter(r => r.status === '在职').length} 人，需 ≥ ${threshold}）。`);
+    return;
+  }
+
+  const area = document.getElementById('recallArea');
+  const needed = Math.ceil(totalVoters * 2/3);
+
+  area.innerHTML = `<div class="card">
+    <strong>罢免程序启动</strong>
+    <div style="font-size:12px;margin-top:6px;">
+      <p>被罢免人：${name}</p>
+      <p>理由：${document.getElementById('recallReason').value}</p>
+      <p>联名代表：${petitioners} 人（需 ≥ ${threshold}）✅</p>
+      <p>全体有选举权成员：${totalVoters} 人</p>
+      <p>需 ${needed} 票（三分之二多数）</p>
+    </div>
+    <div style="margin-top:8px;">
+      <button class="btn btn-danger btn-sm" onclick="executeRecall('${name}')">执行罢免表决</button>
+    </div>
+  </div>`;
+}
+
+function executeRecall(name) {
+  const rep = state.representatives.find(r => r.name === name);
+  if (!rep) return;
+  const totalVoters = state.voters.filter(v => v.eligible).length;
+  const yea = Math.floor(totalVoters * 0.75);
+  const nay = totalVoters - yea;
+  if (yea >= Math.ceil(totalVoters * 2/3)) {
+    rep.status = '已罢免';
+    alert(`罢免通过！赞成 ${yea}/${totalVoters}（≥ 2/3）。${name} 已被罢免。`);
+  }
+  document.getElementById('recallArea').innerHTML = '';
+  renderReps();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>代表手册 - 可操作性验证</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "Noto Sans SC", sans-serif; background: #f5f5f5; padding: 40px; color: #333; }
+.container { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 32px; }
+h1 { font-size: 22px; margin-bottom: 4px; }
+.subtitle { color: #888; font-size: 13px; margin-bottom: 24px; }
+.steps { counter-reset: step; }
+.step { counter-increment: step; margin-bottom: 16px; padding: 12px; border-radius: 6px; background: #fafafa; border-left: 3px solid #e0e0e0; }
+.step.done { border-left-color: #2e7d32; background: #f0faf0; }
+.step .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.step .header .title { font-weight: 500; font-size: 14px; }
+.step .header .title::before { content: counter(step) ". "; }
+.step .desc { font-size: 12px; color: #555; margin-bottom: 8px; line-height: 1.5; }
+.step .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn { padding: 5px 14px; background: #1a73e8; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+.btn:hover { background: #1557b0; }
+.btn-sm { padding: 3px 10px; font-size: 11px; }
+.btn-secondary { background: #e8e8e8; color: #333; }
+.btn-secondary:hover { background: #d0d0d0; }
+.btn-success { background: #2e7d32; }
+.btn-success:hover { background: #1b5e20; }
+.stats { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+.stat { text-align: center; padding: 10px 20px; background: #f8f9fa; border-radius: 6px; flex: 1; }
+.stat .num { font-size: 24px; font-weight: 700; }
+.stat .num.pass { color: #2e7d32; }
+.stat .num.fail { color: #c62828; }
+.stat .lbl { font-size: 11px; color: #888; margin-top: 2px; }
+.progress-bar { height: 6px; background: #eee; border-radius: 3px; margin-bottom: 16px; overflow: hidden; }
+.progress-fill { height: 100%; background: #2e7d32; border-radius: 3px; transition: width .3s; }
+.result-box { padding: 16px; border-radius: 6px; margin-top: 16px; text-align: center; display: none; }
+.result-box.show { display: block; }
+.result-box.pass { background: #e8f5e9; }
+.result-box.fail { background: #fff8e1; }
+.result-box .emoji { font-size: 36px; margin-bottom: 8px; }
+.result-box .title { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+.result-box .desc { font-size: 13px; color: #555; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>代表手册可操作性验证</h1>
+  <p class="subtitle">对照《公司代表章程》和手册逐项验证：新人能否凭文档独立完成代表相关操作。</p>
+
+  <div class="stats">
+    <div class="stat"><div class="num" id="doneCount">0</div><div class="lbl">已完成</div></div>
+    <div class="stat"><div class="num" id="totalCount">8</div><div class="lbl">总步骤</div></div>
+    <div class="stat"><div class="num" id="pct">0%</div><div class="lbl">进度</div></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <div class="steps" id="stepsContainer"></div>
+
+  <div class="result-box" id="resultBox">
+    <div class="emoji" id="resultEmoji"></div>
+    <div class="title" id="resultTitle"></div>
+    <div class="desc" id="resultDesc"></div>
+  </div>
+</div>
+
+<script>
+const steps = [
+  { id: 1, title: '确认代表资格', desc: '查阅手册中代表资格章节，确认 L2 及以上职级或培训生身份具备被提名资格。L0 无资格，L1 无被提名资格。', done: false },
+  { id: 2, title: '确认选举权', desc: '查阅手册确认 L1 及以上成员有选举权。实习生有选举权，实训生无选举权。', done: false },
+  { id: 3, title: '完成选举流程', desc: '按手册选举流程操作：候选人提名 → 选民投票 → 计票公布 → 当选就职。', done: false },
+  { id: 4, title: '了解五项职权', desc: '在手册中找到代表五项职权（信息获取权、提案权、审议权、表决权、程序异议权）的说明，确认自己能向他人解释每一项。', done: false },
+  { id: 5, title: '了解五项职责', desc: '在手册中找到代表五项职责（保密、提案诚信、审议勤勉、独立忠实、程序善意）的对应义务说明。', done: false },
+  { id: 6, title: '辩论规则验证', desc: '确认手册中辩论的三项原则（议题聚焦、意见平衡、主持人中立），以及反对意见受保护条款。', done: false },
+  { id: 7, title: '退出流程操作', desc: '按手册模拟代表退出流程：辞职提交 → 交接 → 确认书签署。确认任期届满、辞职、罢免、丧失资格、离职五种情形。', done: false },
+  { id: 8, title: '罢免程序模拟', desc: '按手册模拟罢免流程：确认罢免理由 → 计算联名门槛（≥1/3代表） → 投票 → 确认通过门槛（≥2/3有选举权成员）。', done: false },
+];
+
+function render() {
+  const container = document.getElementById('stepsContainer');
+  const done = steps.filter(s => s.done).length;
+  const total = steps.length;
+
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('pct').textContent = Math.round(done/total*100) + '%';
+  document.getElementById('pct').className = 'num' + (done === total ? ' pass' : done > 0 ? '' : '');
+  document.getElementById('progressFill').style.width = (done/total*100) + '%';
+
+  container.innerHTML = steps.map(s => `
+    <div class="step ${s.done ? 'done' : ''}">
+      <div class="header">
+        <div class="title">${s.title}</div>
+        ${s.done ? '<span style="font-size:12px;color:#2e7d32;">✅ 已验证</span>' : ''}
+      </div>
+      <div class="desc">${s.desc}</div>
+      <div class="actions">
+        ${s.done
+          ? `<button class="btn btn-sm btn-secondary" onclick="toggleStep(${s.id})">取消</button>
+             <span style="font-size:11px;color:#2e7d32;">操作顺畅，手册指引清晰</span>`
+          : `<button class="btn btn-sm btn-success" onclick="toggleStep(${s.id})">标记已验证</button>
+             <button class="btn btn-sm btn-secondary" onclick="reportIssue(${s.id})">手册不清晰</button>`
+        }
+      </div>
+    </div>
+  `).join('');
+
+  const resultBox = document.getElementById('resultBox');
+  if (done === total) {
+    resultBox.className = 'result-box show pass';
+    document.getElementById('resultEmoji').textContent = '✅';
+    document.getElementById('resultTitle').textContent = '手册可操作性验证通过';
+    document.getElementById('resultDesc').textContent = '所有步骤均能按手册独立完成。手册对公司代表相关流程的描述清晰、可执行。';
+  } else if (done > 0) {
+    resultBox.className = 'result-box show fail';
+    document.getElementById('resultEmoji').textContent = '📖';
+    document.getElementById('resultTitle').textContent = `进度 ${done}/${total}`;
+    document.getElementById('resultDesc').textContent = `还有 ${total - done} 步未验证。完成全部步骤后确认手册可操作性。`;
+  } else {
+    resultBox.className = 'result-box';
+  }
+}
+
+function toggleStep(id) {
+  const s = steps.find(x => x.id === id);
+  if (s) s.done = !s.done;
+  render();
+}
+
+function reportIssue(id) {
+  const issue = prompt('描述手册中哪些地方不清晰、遗漏或难以操作：');
+  if (issue) {
+    alert('已记录问题：「' + issue + '」。建议反馈给文档负责人优化手册。');
+  }
+}
+
+render();
+</script>
+</body>
+</html>

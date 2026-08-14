@@ -93,7 +93,44 @@ status: active
 | `conclusions` | List\<String\> | 结论沉淀（要点列表） |
 | `status` | enum | `scheduled` / `held` / `cancelled` |
 
-**规则**：组织者 = 单人且无备选时自动标注单点风险并提示备选；组织者变更自动提醒重新指定。复盘是组织云「体检纠偏、推动变革」的机制载体。
+**规则**：组织者 = 单人且无备选时自动标注单点风险并提示备选；组织者变更自动提醒重新指定。复盘是组织健康度「机制健康」的数据源（召开率、结论沉淀率）。
+
+## 组织健康度（models/health/）
+
+概念框架：McKinsey OHI（组织健康指数）九维度，量潮适配版。指标与分级约定见 `data/context/handbook/health.md`。
+
+### HealthDimension — OHI 健康度维度
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `id` | String | 维度标识（direction / leadership / …） |
+| `name` / `englishName` | String | 维度名（中/英） |
+| `description` | String | 关注问题 |
+| `indicator` | String | 当前指标说明（由数据推导的结论） |
+| `level` | enum | `good` / `warning` / `risk` / `notAssessed` |
+
+### HealthReport — 体检报告
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `dimensions` | List\<HealthDimension\> | 九维度 |
+| `overall` | enum | 整体等级（已评估维度平均：≥2.5 良好 / ≥1.5 注意 / 其余警示） |
+| `score` | double | 已评估维度平均分（1-3） |
+| `temperature` | double | 组织温度计 = 36.5 + (score − 2) × 0.3（36.5°C 基准） |
+
+**推导函数** `computeHealthReport(...)`：纯函数，输入数据列表，输出报告。九个维度的指标与分级：
+
+| 维度 | 指标 | 分级（良好/注意/警示） |
+|---|---|---|
+| 方向 Direction | 复盘结论沉淀率 | ≥80% / ≥50% / 其余 |
+| 领导力 Leadership | 最大管理幅度 | ≤5 / ≤8 / 其余 |
+| 文化 Culture | 复盘按时召开率 | ≥80% / ≥50% / 其余 |
+| 责任 Accountability | 单点风险岗位数 | 0 / ≤2 / 其余 |
+| 协调与控制 Coordination | 待审批变更滞留数 | 0 / ≤2 / 其余 |
+| 能力 Capabilities | 编制完整率 | ≥80% / ≥60% / 其余 |
+| 激励 Motivation | 复盘参与覆盖率 | ≥80% / ≥50% / 其余 |
+| 外部导向 External | 无数据源 | 待问卷（不参与平均分） |
+| 创新与学习 Innovation | 变更活跃度 | ≥2 / ≥1 / 0 |
 
 ## 变更记录（models/change_record.dart）
 

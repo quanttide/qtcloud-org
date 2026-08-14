@@ -46,17 +46,58 @@ void main() {
     expect(find.textContaining('产品负责人'), findsWidgets);
   });
 
-  testWidgets('导航到复盘页并查看结论', (tester) async {
+  testWidgets('健康度总览展示组织温度计与 OHI 九维度', (tester) async {
     await tester.pumpWidget(const QtcloudOrgStudioApp());
 
-    await tester.tap(find.text('复盘'));
+    await tester.tap(find.text('健康度'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('组织健康度'), findsOneWidget);
+    expect(find.text('组织温度计'), findsOneWidget);
+    expect(find.text('方向 Direction'), findsOneWidget);
+
+    await tester.drag(find.text('组织温度计'), const Offset(0, -800));
+    await tester.pumpAndSettle();
+
+    expect(find.text('外部导向 External Orientation'), findsOneWidget);
+    expect(find.text('待问卷'), findsOneWidget);
+  });
+
+  testWidgets('健康度页查看复盘记录与结论', (tester) async {
+    await tester.pumpWidget(const QtcloudOrgStudioApp());
+
+    await tester.tap(find.text('健康度'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('复盘记录'));
     await tester.pumpAndSettle();
 
     expect(find.text('2026-08-20'), findsOneWidget);
     await tester.tap(find.text('2026-08-20'));
     await tester.pumpAndSettle();
 
+    await tester.drag(find.text('复盘 · 2026-08-20'), const Offset(0, -400));
+    await tester.pumpAndSettle();
+
     expect(find.text('结论沉淀'), findsOneWidget);
     expect(find.textContaining('复盘结论示例'), findsOneWidget);
+  });
+
+  testWidgets('复盘状态流转：标记已召开后待召开消失', (tester) async {
+    await tester.pumpWidget(const QtcloudOrgStudioApp());
+
+    await tester.tap(find.text('健康度'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('复盘记录'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2026-08-20'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('待召开'), findsWidgets);
+    await tester.tap(find.text('标记已召开'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('已召开'), findsOneWidget);
+    expect(find.text('待召开'), findsNothing);
+    expect(find.text('无单点风险'), findsOneWidget);
   });
 }

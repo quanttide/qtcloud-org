@@ -1,4 +1,5 @@
 import 'models/change_record.dart';
+import 'models/health/health_report.dart';
 import 'models/member/member.dart';
 import 'models/org/department.dart';
 import 'models/org/position.dart';
@@ -44,6 +45,15 @@ class SampleData {
   List<ChangeRecord> get pendingChanges =>
       changeRecords.where((c) => c.approval == ApprovalStatus.pending).toList();
 
+  /// 健康度体检报告（OHI 九维度推导）。
+  HealthReport get healthReport => computeHealthReport(
+    retrospectives: retrospectives,
+    reportRelations: reportRelations,
+    positions: positions,
+    members: members,
+    changeRecords: changeRecords,
+  );
+
   /// 风险聚合：岗位单人承担 / 岗位空缺 / 复盘组织者=单人。
   List<RiskItem> get risks {
     final items = <RiskItem>[];
@@ -75,7 +85,7 @@ class SampleData {
       items.add(
         RiskItem(
           type: RiskType.organizerSingle,
-          subject: '「${retro.scheduleDate} ${_retroTitle(retro)}」复盘组织者=单人',
+          subject: '「${retro.scheduleDate}」复盘组织者=单人（${organizer.name}）',
           alternatives: members
               .where((m) => m.id != organizer.id && !m.isDeparted)
               .map((m) => m.name)
@@ -88,8 +98,6 @@ class SampleData {
 
   List<String> _suggestionsFor(Position position) =>
       members.where((m) => !m.isDeparted).map((m) => m.name).toList();
-
-  String _retroTitle(Retrospective retro) => retro.id;
 }
 
 /// 全局示例数据。
@@ -184,6 +192,14 @@ final sampleData = SampleData(
       organizerId: 'member-zhang',
       participantIds: ['member-li'],
       conclusions: ['复盘结论示例：本周例会机制运转正常'],
+    ),
+    Retrospective(
+      id: 'retro-weekly-0813',
+      scheduleDate: '2026-08-13',
+      organizerId: 'member-zhang',
+      participantIds: ['member-li'],
+      conclusions: ['复盘结论：例会机制需固定节奏', '识别产品负责人空缺，需尽快指定'],
+      status: RetrospectiveStatus.held,
     ),
   ],
   changeRecords: const [

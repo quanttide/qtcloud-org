@@ -13,7 +13,7 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _index = 0;
 
-  static const _labels = ['首页', '架构', '成员', '复盘'];
+  static const _labels = ['首页', '架构', '成员', '健康度'];
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +43,8 @@ class _AppShellState extends State<AppShell> {
                   label: Text(_labels[2]),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.assignment_outlined),
-                  selectedIcon: const Icon(Icons.assignment),
+                  icon: const Icon(Icons.monitor_heart_outlined),
+                  selectedIcon: const Icon(Icons.monitor_heart),
                   label: Text(_labels[3]),
                 ),
               ],
@@ -68,8 +68,8 @@ class _AppShellState extends State<AppShell> {
           ),
           NavigationDestination(icon: Icon(Icons.people_outline), label: '成员'),
           NavigationDestination(
-            icon: Icon(Icons.assignment_outlined),
-            label: '复盘',
+            icon: Icon(Icons.monitor_heart_outlined),
+            label: '健康度',
           ),
         ],
       ),

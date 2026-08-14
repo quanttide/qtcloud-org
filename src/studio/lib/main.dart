@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'screens/health/health_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/members/members_screen.dart';
 import 'screens/org_structure/org_structure_screen.dart';
-import 'screens/retrospective/retrospective_screen.dart';
 import 'widgets/navigation/app_shell.dart';
 
 void main() {
@@ -25,7 +25,7 @@ class QtcloudOrgStudioApp extends StatelessWidget {
           HomeScreen(),
           OrgStructureScreen(),
           MembersScreen(),
-          RetrospectiveScreen(),
+          HealthScreen(),
         ],
       ),
     );

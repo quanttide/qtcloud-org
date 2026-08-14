@@ -23,12 +23,13 @@
 
 ## 关键操作记录（手动部署踩坑，参考 qtclass）
 
-1. **阻止公共访问**：2023 后新 OSS 桶默认开启"阻止公共访问"，即使 ACL=public-read 匿名访问也返回 `AccessDenied`。已通过 `PutBucketPublicAccessBlock`（`BlockPublicAccess=false`）关闭，并在 `studio.tf` 固化；如重建桶需注意。
+1. **阻止公共访问**：2023 后新 OSS 桶默认开启"阻止公共访问"，即使 ACL=public-read 匿名访问也返回 `AccessDenied`。已通过 `PutBucketPublicAccessBlock`（`BlockPublicAccess=false`）关闭，并在 `studio.tf` 固化；如重建桶需注意。另注意：terraform 创建桶后 ACL 曾出现漂移（实际回退为 private），需以 `terraform apply` 纠正（`terraform plan` 可检出）。
 2. **静态网站托管**：桶需配置 `website`（index.html 默认页），否则 CDN 根路径 403。
-3. **CDN 配置**（控制台/CLI 完成，`scripts/configure-cloud-cdn.sh` 固化证书与 DNS）：
-   - `AddCdnDomain`：`org.cloud.quanttide.com`，源站 OSS `qtcloud-org-studio.oss-cn-hangzhou.aliyuncs.com`（type=oss, port=443）
-   - HTTPS：上传 `*.quanttide.com` 证书（`SetCdnDomainSSLCertificate`，acme.sh 3 个月续期）
-   - DNS：`org.cloud.quanttide.com` CNAME → `org.cloud.quanttide.com.w.kunlunaq.com`
+3. **CDN 配置**（2026-08-14 已全部落地，`aliyun cdn` CLI 操作）：
+   - `AddCdnDomain`：`org.cloud.quanttide.com`，源站 OSS `qtcloud-org-studio.oss-cn-hangzhou.aliyuncs.com`（type=oss, port=443，对齐 `delib.cloud.quanttide.com`）
+   - DNS：`org.cloud.quanttide.com` CNAME → `org.cloud.quanttide.com.w.kunlunaq.com`（`aliyun alidns AddDomainRecord`）
+   - HTTPS：**专属证书** `org.cloud.quanttide.com`（acme.sh `dns_ali` 挑战签发，ZeroSSL ECC；⚠ 通配证书 `*.quanttide.com` 不覆盖二级子域）
+   - 续期：`acme.sh --reloadcmd` 已指向 `~/.acme.sh/deploy-cdn-cert-org.sh`（续期后自动重绑 CDN，对齐 project.cloud 模式）
 
 ## 使用
 

@@ -5,6 +5,13 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.0-alpha.2] - 2026-08-14
+
+### 修复
+
+- 发布管线：落地 OSS 发布桶 IaC（terraform apply → `qtcloud-org-studio`，静态网站托管 + 公共读）
+- 发布管线：接入 CDN 域名 `org.cloud.quanttide.com`（源站 OSS，对齐 `delib.cloud.quanttide.com` 配置）
+
 ## [0.1.0-alpha.1] - 2026-08-14
 
 ### 新增

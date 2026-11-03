@@ -1,0 +1,32 @@
+:root {
+  --ink: #1f2328;
+  --ink-soft: #59636e;
+  --line: #d8dee4;
+  --bg: #f6f8fa;
+  --card: #ffffff;
+  --accent: #0969da;
+  font-family: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+}
+
+h3 {
+  font-size: 1.05rem;
+}

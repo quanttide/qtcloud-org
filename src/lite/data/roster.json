@@ -1,0 +1,98 @@
+{
+  "orgs": [
+    {
+      "id": "qtalliance",
+      "name": "量潮创新联盟",
+      "groups": [
+        {
+          "title": "理事会",
+          "entries": [
+            { "name": "张果", "title": "联盟创始人、联盟理事长" },
+            { "name": "奚哲勖", "title": "联盟副理事长" },
+            { "name": "樊仲琛", "title": "联盟副理事长" },
+            { "name": "黄梓姗", "title": "联盟理事、理事会秘书" },
+            { "name": "梁嘉伟", "title": "联盟理事、理事会秘书" },
+            { "name": "涂雅芳", "title": "联盟理事会秘书" }
+          ]
+        },
+        {
+          "title": "联盟代表大会",
+          "entries": [
+            { "name": "赵子奕", "title": "联盟议长" },
+            { "name": "鲍宇航", "title": "联盟副议长" }
+          ]
+        },
+        {
+          "title": "秘书处",
+          "entries": [
+            { "name": "李可欣", "title": "联盟代表、联盟秘书长" },
+            { "name": "林莉婷", "title": "联盟代表、联盟副秘书长" },
+            { "name": "黄亮", "title": "联盟代表、联盟秘书" },
+            { "name": "王敏华", "title": "联盟代表、联盟秘书" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qttech",
+      "name": "量潮科技",
+      "groups": [
+        {
+          "title": "管理团队",
+          "entries": [
+            { "name": "张果", "title": "创始人、董事长、CEO" },
+            { "name": "黄梓姗", "title": "合伙人、COO" },
+            { "name": "梁嘉伟", "title": "合伙人、CTO" },
+            { "name": "涂雅芳", "title": "股东代表、执行副总裁" },
+            { "name": "赵子奕", "title": "公司代表、秘书长" },
+            { "name": "李可欣", "title": "公司代表、副秘书长" }
+          ]
+        },
+        {
+          "title": "顾问团队",
+          "entries": [
+            { "name": "奚哲勖", "title": "首席创始顾问" },
+            { "name": "樊仲琛", "title": "首席战略顾问" },
+            { "name": "谢梓鹏", "title": "资深技术顾问" },
+            { "name": "窦烨", "title": "高级技术顾问" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qtacademy",
+      "name": "量潮实训基地",
+      "groups": [
+        {
+          "title": "管理团队",
+          "entries": [
+            { "name": "黄亮", "title": "总裁、议长" },
+            { "name": "王敏华", "title": "副总裁、副议长" },
+            { "name": "孟金曼", "title": "游戏总监、实训基地代表" },
+            { "name": "秦悦鑫", "title": "小说总监、实训基地代表" }
+          ]
+        },
+        {
+          "title": "秘书处",
+          "entries": [
+            { "name": "罗析芸", "title": "秘书长、实训基地代表" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qtinstitute",
+      "name": "量潮研究院",
+      "note": "拟设 / 筹建",
+      "groups": [
+        {
+          "title": "管理团队",
+          "entries": [
+            { "name": "鲍宇航", "title": "总裁" },
+            { "name": "林莉婷", "title": "副总裁" }
+          ]
+        }
+      ]
+    }
+  ]
+}

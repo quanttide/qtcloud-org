@@ -32,4 +32,8 @@ src/
 
 ## 部署
 
-未接：OSS 桶与子域口径待定（家族惯例 `lite.<产品>.cloud.quanttide.com`），版本号与发布时机由用户定。
+链路：推送 `lite/*` tag → GitHub Actions（本包构建）→ OSS 桶 `qtcloud-org-lite` → CDN `lite.org.cloud.quanttide.com`。
+
+- 流水线：`.github/workflows/deploy-lite.yml`（与本仓 deploy-studio.yml 同款；只由 tag 触发，不设手动触发）
+- 基础设施：`../../manifests/terraform/lite.tf`（桶）+ `cdn.tf`（CDN 域名、强制 HTTPS、DNS CNAME）；证书 acme.sh 单域名续期自动重绑
+- 首发：待版本号（用户定）后切 `lite/<版本>` tag 触发

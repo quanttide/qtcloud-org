@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/org/department.dart';
 import '../../models/org/position.dart';
 
-/// 部门 → 岗位 → 汇报链路的树形展示（架构页私有组件）。
+/// 部门 → 岗位 → 汇报链路的树形展示（架构页私有组件；已归档部门不展示）。
 class DepartmentTree extends StatelessWidget {
   const DepartmentTree({
     super.key,
@@ -24,7 +24,9 @@ class DepartmentTree extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topLevel = departments.where((d) => d.parentId == null).toList();
+    final topLevel = departments
+        .where((d) => d.parentId == null && d.status == DepartmentStatus.active)
+        .toList();
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [for (final dept in topLevel) _buildDepartment(dept)],
@@ -33,7 +35,9 @@ class DepartmentTree extends StatelessWidget {
 
   Widget _buildDepartment(Department dept) {
     final subDepartments = departments
-        .where((d) => d.parentId == dept.id)
+        .where(
+          (d) => d.parentId == dept.id && d.status == DepartmentStatus.active,
+        )
         .toList();
     final deptPositions = positions
         .where((p) => p.departmentId == dept.id)

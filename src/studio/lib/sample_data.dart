@@ -102,12 +102,12 @@ class SampleData {
 
 /// 全局示例数据。
 final sampleData = SampleData(
-  departments: const [
+  departments: [
     Department(id: 'dept-gov', name: '治理部'),
     Department(id: 'dept-rd', name: '产品研发部'),
     Department(id: 'dept-ops', name: '运营部'),
   ],
-  positions: const [
+  positions: [
     Position(
       id: 'pos-founder',
       departmentId: 'dept-gov',
@@ -202,7 +202,7 @@ final sampleData = SampleData(
       status: RetrospectiveStatus.held,
     ),
   ],
-  changeRecords: const [
+  changeRecords: [
     ChangeRecord(
       id: 'change-001',
       authorId: 'member-zhang',
